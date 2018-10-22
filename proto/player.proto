@@ -1,0 +1,39 @@
+syntax = "proto2";
+
+package usercmd;
+
+enum MsgType {
+	Login				= 1;  // 登录
+	ErrorMsg 			= 25; // 错误消息
+	TeamAddr			= 39; // 组队服地址
+	
+};
+
+//返回统一错误码
+message RetErrorMsg
+{
+	required uint32 RetCode=1;//错误码
+	optional uint32 Params =2;//参数
+	optional string JsonParam=3;//参数
+}
+
+// 获取组队服务器地址 /game?c=TeamAddr
+message RetTeamAddr
+{
+	required string Address	= 1; //	组队服的ip:端口
+	required string Key		= 2; // 验证的密钥
+}
+
+message ObjNode
+{
+	required uint32 Id=1;
+	required uint32 Num =2;
+	optional uint32 Money=3;
+}
+
+message ActAward
+{
+	required uint32 TypeId =1;
+	required uint32 Nums= 2;
+	required uint32 State =3;
+}

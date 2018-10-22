@@ -1,0 +1,81 @@
+syntax="proto2";
+
+package usercmd;
+
+enum GatewayCmd
+{
+	ServiceReg			= 1;
+	ServiceAdd			= 3; //节点添加
+	ServiceLeave		= 4; // 服务器节点离开
+	UserLogin			= 15; // 用户登录
+	S2CNotice			= 21; //转发通知消息
+	SendNotice			= 22; //转发全服通知
+	S2CNoticeBatch		= 23; //批量转发通知消息
+	ServiceHeartbeat	= 29; //心跳
+	FullNotice			= 30; //全服通知
+	
+}
+message ReqHttpArgData{
+	message KeyVal{
+		required string Key=1;
+		required string val=2;
+	}
+	repeated KeyVal Args=1;
+	required uint32 Cmd=2;
+}
+
+message ReqServiceReg {
+	required string Key =1;
+	required uint32 ServerType	=2;
+	required uint32 ServerId	=3;
+	optional string Address		=4;
+	optional string InAddress	=5;
+}
+
+message RetServiceReg {
+	required uint32 Id		=1;
+	repeated uint32 NodeIds	=2;
+}
+
+// 添加服务节点
+message RetServiceAdd {
+	required uint32 Id		=1;
+	required string Address	=2;
+	required uint32 Type	=3;
+}
+
+// 删除服务节点
+message RetServiceLeave {
+	required uint32 Id		= 1; // 服务器Id
+	required uint32 Type	= 2; // 服务器类型
+}
+
+// 玩家登录上线
+message ReqUserLogin {
+	required uint64 UserId			= 1; 
+	required string Account			= 2;
+	required string Name			= 5;
+	required uint32 Location		= 7;
+	required uint32 CNet			= 8; // 网络类型
+	optional uint32 Money			= 9; // 玩家剩余彩豆
+	optional uint32 MaxLevel		= 10; // 最高段位
+	optional uint32 Credit			= 11; //信誉值
+}
+
+// 批量转发消息
+message ReqS2CNoticeBatch {
+	repeated uint64 UserIds	= 1;
+	required bytes Data		= 2;
+	required uint32 Flag 	= 3;
+}
+
+message ReqServiceHeartbeat{
+}
+
+// 全服通知
+message ReqFullNotice
+{
+	required uint32 Type 	= 1; 
+	required bytes Data		= 2;
+	required uint32 Flag	= 3;
+}

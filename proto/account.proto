@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package usercmd;
+
+// 请求登录 /msg?c=Login?a=帐号&p=密码&dev=设备号&device=android|ios&r=1注册,0或不填登录&t=时间戳
+message RetLoginMsg
+{
+	required string Account		= 1; // 账号
+	required string Password	= 2; // 密码
+    required uint64 Id			= 3; // 玩家id
+	optional bytes SessionKey	= 4; // session与key
+	optional string Address		= 5; // gateway地址
+	optional string Key			= 6; // 连gateway带的key
+}
+	
