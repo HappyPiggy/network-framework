@@ -11,7 +11,6 @@ public class UILoginPage : UIPage {
     protected override void OnAwake()
     {
         base.OnAwake();
-        Layer = UILayerDef.Page;
 
         openLoginBtn = Find<Button>("start");
         AddUIClickListener(openLoginBtn, OnOpenLoginBtnClick);

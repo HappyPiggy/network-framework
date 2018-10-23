@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package usercmd;
 
-// 请求登录 /msg?c=Login?a=帐号&p=密码&dev=设备号&device=android|ios&r=1注册,0或不填登录&t=时间戳
+// 请求登录 /login?c=Login?a=帐号&p=密码&dev=设备号&device=android|ios&r=1注册,0或不填登录&t=时间戳
 message RetLoginMsg
 {
 	required string Account		= 1; // 账号

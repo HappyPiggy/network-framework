@@ -296,4 +296,31 @@ public class UIManager : Singleton<UIManager>
     #endregion
 
     //=======================================================================
+
+
+
+
+    //=======================================================================
+
+    #region UIWidget管理
+
+    public UIWidget OpenWidget(string name, object arg = null)
+    {
+        UIWidget ui = Open<UIWidget>(name, arg,Type.GetType(name));
+        return ui;
+    }
+
+    public void CloseWidget(string name, object arg = null)
+    {
+        UIWidget ui = GetUI(name) as UIWidget;
+        if (ui != null)
+        {
+            ui.Close(arg);
+        }
+    }
+
+    #endregion
+
+
+    //==========================================================================================
 }

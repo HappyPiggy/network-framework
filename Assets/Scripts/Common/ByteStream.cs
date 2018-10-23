@@ -110,6 +110,8 @@ public class ByteStream:Stream
         buf[pos + 6] = (byte)(n >> 48 & 0xff);
         buf[pos + 7] = (byte)(n >> 56 & 0xff);
         Move(8);
+
+       // BitConverter.GetBytes
     }
 
     public byte[] GetUsedBytes()

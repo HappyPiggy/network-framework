@@ -19,7 +19,6 @@ public class UILoginWindow:UIWindow
     protected override void OnAwake()
     {
         base.OnAwake();
-        Layer = UILayerDef.NormalWindow;
 
         btnClose = Find<Button>("cancel");
         accountText = Find<InputField>("account/InputField");
@@ -33,21 +32,28 @@ public class UILoginWindow:UIWindow
     private void OnLoginBtnClick()
     {
         //用户登录操作
-        NetworkUpdater.Instance.HttpReqLogin(OnLoginRet,"account", accountText.ToString(), "password",passwordText.ToString());
+        NetworkUpdater.Instance.HttpReqLogin(OnLoginRet,"a", accountText.text.ToString(), "p",passwordText.text.ToString());
     }
 
     private void OnLoginRet(RetLoginMsg data, RetErrorMsg error)
     {
         if (error != null || data == null)
         {
-            Debug.Log("login收到消息出错 错误号:" + error.RetCode);
-            Debug.Log("错误描述 :" + error.JsonParam);
+            string dec = string.Format("{0}\n（错误码:{1}）",error.ErrorReason,error.RetCode);
+            UIManager.Instance.OpenWidget("UITipsWidget", dec);
             return;
         }
 
-        Debug.Log(data.Account);
-        Debug.Log(data.Id);
-        HttpClient.SetSession(data.SessionKey, data.Id);
+        bool res=HttpClient.SetSession(data.SessionKey, data.Id);
+        if (res)
+        {
+            UIManager.Instance.OpenWidget("UITipsWidget","登录成功");
+            UIManager.Instance.CloseWindow("UILoginWindow");
+        }
+        else
+        {
+            UIManager.Instance.OpenWidget("UITipsWidget", "session结构不对");
+        }
     }
 
 

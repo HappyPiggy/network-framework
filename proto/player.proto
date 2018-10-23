@@ -6,15 +6,13 @@ enum MsgType {
 	Login				= 1;  // 登录
 	ErrorMsg 			= 25; // 错误消息
 	TeamAddr			= 39; // 组队服地址
-	
 };
 
 //返回统一错误码
 message RetErrorMsg
 {
-	required uint32 RetCode=1;//错误码
-	optional uint32 Params =2;//参数
-	optional string JsonParam=3;//参数
+	required uint32 RetCode		=1;//错误码
+	optional string ErrorReason =2;//参数
 }
 
 // 获取组队服务器地址 /game?c=TeamAddr

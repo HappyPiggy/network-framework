@@ -217,8 +217,8 @@ public class HttpClient
         }
 
 
-        MemoryStream stream = new MemoryStream(recvData);
-        stream.SetLength(recvData.Length);
+        MemoryStream stream = new MemoryStream(protoData);
+        stream.SetLength(protoData.Length);
 
         //错误协议号
         if (cmd == 25)
@@ -291,7 +291,7 @@ public class HttpClient
         {
             case ErrorType.None:
                 if (callback != null)
-                    callback.Method.Invoke(callback.Target, new object[] { recvObject });
+                    callback.Method.Invoke(callback.Target, new object[] { recvObject ,null});
                 break;
             case ErrorType.CallbackError:
                 if (callback != null)
@@ -301,7 +301,7 @@ public class HttpClient
                 if (callback != null)
                     callback.Method.Invoke(callback.Target, new object[] { null,
                     new RetErrorMsg() {
-                        JsonParam=errorObject.ToString() 
+                        ErrorReason=errorObject.ToString() 
                     } }
                 );
                 break;

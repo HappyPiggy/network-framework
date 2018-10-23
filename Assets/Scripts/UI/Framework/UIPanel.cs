@@ -20,6 +20,7 @@ public abstract class UIPanel : MonoBehaviour
 
     private void Awake()
     {
+        layer = UILayerDef.GetDefaultLayer(UIType);
         OnAwake();
     }
 

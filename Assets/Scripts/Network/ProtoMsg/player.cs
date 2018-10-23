@@ -22,21 +22,13 @@ namespace usercmd
       get { return _RetCode; }
       set { _RetCode = value; }
     }
-    private uint _Params = default(uint);
-    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"Params", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(uint))]
-    public uint Params
-    {
-      get { return _Params; }
-      set { _Params = value; }
-    }
-    private string _JsonParam = "";
-    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"JsonParam", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    private string _ErrorReason = "";
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"ErrorReason", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
-    public string JsonParam
+    public string ErrorReason
     {
-      get { return _JsonParam; }
-      set { _JsonParam = value; }
+      get { return _ErrorReason; }
+      set { _ErrorReason = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
