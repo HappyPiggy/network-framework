@@ -37,6 +37,8 @@ public class HttpClient
     private Delegate callback; //http请求的回调
     private Action<ErrorType> errCallBack;
 
+    private WWW ret;
+
 
 
     /// <summary>
@@ -161,9 +163,9 @@ public class HttpClient
                     yield break;
                 }
 
-                byte[] msg = EncryptUtils.AesEncrypt(stream.ToArray(), sessionEnKey);
-                writer= new ByteStream(msg.Length+24);//session 16 +uid 8 =24
-                writer.Write(msg);
+                byte[] msgbody = EncryptUtils.AesEncrypt(stream.ToArray(), sessionEnKey);
+                writer= new ByteStream(msgbody.Length+24);//session 16 +uid 8 =24
+                writer.Write(msgbody);
                 writer.Write(sessionKey);
             }
             else
@@ -180,7 +182,7 @@ public class HttpClient
             Debug.LogError("加密失败 "+ex.Message);
         }
 
-        WWW ret = new WWW(url, writer.GetUsedBytes());
+        ret = new WWW(url, writer.GetUsedBytes());
         yield return ret;
 
         if (ret.error == null && ret.bytes != null)
@@ -255,6 +257,15 @@ public class HttpClient
     }
 
     /// <summary>
+    /// 请求结束后的清理
+    /// </summary>
+    private void End()
+    {
+        if (ret != null)
+            ret.Dispose();
+    }
+
+    /// <summary>
     /// 登录成功需要保存session和uid 
     /// 之后的http请求用
     /// </summary>
@@ -309,5 +320,7 @@ public class HttpClient
                 Debug.Log("传入参数或解析数据出错");
                 break;
         }
+
+        End();
     }
 }

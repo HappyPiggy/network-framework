@@ -2,23 +2,8 @@
 
 public class AppMain : MonoBehaviour {
 
-    //private static  AppMain _instance;
-    //public static AppMain Instance
-    //{
-    //    get
-    //    {
-    //        return _instance;
-    //    }
-    //}
-
     public static GameObject uiRoot;
     public static GameObject GM; //游戏总管理器
-
-    //private void Awake()
-    //{
-    //    _instance = this;
-    //}
-
 
 
     void Start () {
@@ -34,8 +19,20 @@ public class AppMain : MonoBehaviour {
         UIManager.Instance.OpenPage("UILoginPage");
 
         //初始化网络组件
-        GM.AddComponent<NetworkUpdater>();
-      
+         GM.AddComponent<NetworkUpdater>();
+         GM.AddComponent<TcpManager>();
+
+        Test();
+    }
+
+
+    void Test()
+    {
+        //byte[] x = { 1,1 };
+        ////int a = 1;
+        ////int b = 1;
+        ////print(a+(b<<8));
+        //print(x[0]|x[1]<<8);
     }
 
 }

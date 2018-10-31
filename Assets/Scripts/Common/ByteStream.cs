@@ -14,16 +14,43 @@ public class ByteStream:Stream
     private static int packSize = 64;//buf不够后每次增长空间
 
     public byte[] buf;
-    public int pos; //当前buf最右index
+    public int readPos; //当前已读的buf中的索引
     public int used;//当前buf使用过的最右index
     public int capacity;
     public int offset;
+
+    /// <summary>
+    /// 注意返回的是int不是byte
+    /// </summary>
+    /// <returns></returns>
+    public override int ReadByte()
+    {
+        readPos++;
+        return buf[readPos - 1];
+    }
+
+    public byte[] ReadByte(int count)
+    {
+        if (count <= 0 || readPos+count>=capacity)
+            return null;
+        byte[] newBuf = new byte[count];
+        Buffer.BlockCopy(buf,readPos,newBuf,0,count);
+        readPos += count;
+        return newBuf;
+    }
+
+    public int ReadInt16()
+    {
+        int a = ReadByte();
+        int b = ReadByte();
+        return a + (b << 8);//如果是byte操作 则a[0]|a[1]<<8
+    }
 
     public override bool CanRead
     {
         get
         {
-            return used > pos;
+            return used > readPos;
         }
     }
 
@@ -55,13 +82,22 @@ public class ByteStream:Stream
     {
         get
         {
-            return pos;
+            return readPos;
         }
         set
         {
-            pos = offset + (int)value;
+            readPos = offset + (int)value;
         }
     }
+
+    public int UnreadBytes
+    {
+        get
+        {
+            return used - readPos;
+        }
+    }
+
     public ByteStream(int size)
     {
         ResetBytes(size);
@@ -77,9 +113,32 @@ public class ByteStream:Stream
         {
             buf = new byte[size];
         }
-        pos = 0;
+        readPos = 0;
         used = 0;
         capacity = size;
+    }
+
+    public void Append(ByteStream recvBuf)
+    {
+        Grow(recvBuf.used);
+        int left = capacity - used;
+        if (left < recvBuf.used)
+        {
+            capacity = used + recvBuf.used;
+            byte[] newBuf = new byte[capacity];
+            if (used > 0)
+            {
+                Array.Copy(buf,newBuf,used);
+            }
+            Array.Copy(recvBuf.buf,0,newBuf,used,recvBuf.used);
+            buf = newBuf;
+        }
+        else
+        {
+            Array.Copy(recvBuf.buf,0,buf,used,recvBuf.used);
+        }
+
+        used += recvBuf.used;
     }
 
     /// <summary>
@@ -91,9 +150,10 @@ public class ByteStream:Stream
         if (p == null || p.Length == 0) return;
         int len = p.Length;
         Grow(len);
-        Buffer.BlockCopy(p,0,buf,pos,len);
+        Buffer.BlockCopy(p,0,buf,readPos,len);
         Move(len);
     }
+
     /// <summary>
     /// uint转byte写入buf
     /// </summary>
@@ -101,17 +161,26 @@ public class ByteStream:Stream
     public void Write(ulong n)
     {
         Grow(8);
-        buf[pos + 0] = (byte)(n & 0xff);
-        buf[pos + 1] = (byte)(n >> 8 & 0xff);
-        buf[pos + 2] = (byte)(n >> 16 & 0xff);
-        buf[pos + 3] = (byte)(n >> 24 & 0xff);
-        buf[pos + 4] = (byte)(n >> 32 & 0xff);
-        buf[pos + 5] = (byte)(n >> 40 & 0xff);
-        buf[pos + 6] = (byte)(n >> 48 & 0xff);
-        buf[pos + 7] = (byte)(n >> 56 & 0xff);
+        buf[readPos + 0] = (byte)(n & 0xff);
+        buf[readPos + 1] = (byte)(n >> 8 & 0xff);//0xff=....0000 11111111  转无符
+        buf[readPos + 2] = (byte)(n >> 16 & 0xff);
+        buf[readPos + 3] = (byte)(n >> 24 & 0xff);
+        buf[readPos + 4] = (byte)(n >> 32 & 0xff);
+        buf[readPos + 5] = (byte)(n >> 40 & 0xff);
+        buf[readPos + 6] = (byte)(n >> 48 & 0xff);
+        buf[readPos + 7] = (byte)(n >> 56 & 0xff);
         Move(8);
 
        // BitConverter.GetBytes
+    }
+
+
+    public void Write(ushort n)
+    {
+        Grow(2);
+        buf[readPos + 0] = (byte)(n & 0xff);
+        buf[readPos + 1] = (byte)(n >> 8 & 0xff);
+        Move(2);
     }
 
     public byte[] GetUsedBytes()
@@ -122,12 +191,17 @@ public class ByteStream:Stream
     }
 
 
-
+    /// <summary>
+    /// 读了buf不一定写了buf
+    /// 写了buf当做已读buf，所以写buf的时候
+    /// readPos也要移动
+    /// </summary>
+    /// <param name="size"></param>
     private void Move(int size)
     {
-        pos += size;
-        if (pos > used)
-            used = pos;
+        readPos += size;
+        if (readPos > used)
+            used = readPos;
     }
 
     /// <summary>
@@ -136,7 +210,7 @@ public class ByteStream:Stream
     /// <param name="size"></param>
     public void Grow(int size)
     {
-        int left = capacity - pos;
+        int left = capacity - readPos;
         
         //剩余空间小于预计分配的空间 则要扩充cap
         if (left < size)
@@ -159,6 +233,12 @@ public class ByteStream:Stream
         stream.Seek(0, SeekOrigin.Begin);
         stream.Read(bytes, 0, bytes.Length);
         return bytes;
+    }
+
+    public void Clear()
+    {
+        readPos = 0;
+        used = 0;
     }
 
     public override void Flush()

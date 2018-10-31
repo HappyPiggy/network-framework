@@ -303,6 +303,15 @@ public class UIManager : Singleton<UIManager>
     //=======================================================================
 
     #region UIWidget管理
+    
+    /// <summary>
+    /// 方便显示tips
+    /// </summary>
+    /// <param name="str"></param>
+    public void ShowTips(string str)
+    {
+        Instance.OpenWidget("UITipsWidget", str);
+    }
 
     public UIWidget OpenWidget(string name, object arg = null)
     {

@@ -32,28 +32,65 @@ public class UILoginWindow:UIWindow
     private void OnLoginBtnClick()
     {
         //用户登录操作
-        NetworkUpdater.Instance.HttpReqLogin(OnLoginRet,"a", accountText.text.ToString(), "p",passwordText.text.ToString());
+        Loom.QueueOnMainThread(()=> {
+            NetworkUpdater.Instance.HttpReqLogin(OnLoginRet, "a", accountText.text.ToString(), "p", passwordText.text.ToString());
+        });
+       
     }
 
+    /// <summary>
+    /// 登录成功后返回消息
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="error"></param>
     private void OnLoginRet(RetLoginMsg data, RetErrorMsg error)
     {
         if (error != null || data == null)
         {
             string dec = string.Format("{0}\n（错误码:{1}）",error.ErrorReason,error.RetCode);
-            UIManager.Instance.OpenWidget("UITipsWidget", dec);
+            UIManager.Instance.ShowTips(dec);
             return;
         }
 
         bool res=HttpClient.SetSession(data.SessionKey, data.Id);
         if (res)
         {
-            UIManager.Instance.OpenWidget("UITipsWidget","登录成功");
+            UIManager.Instance.ShowTips("登录成功");
             UIManager.Instance.CloseWindow("UILoginWindow");
+
+            OnLoginSuccess(data);
         }
         else
         {
-            UIManager.Instance.OpenWidget("UITipsWidget", "session结构不对");
+            UIManager.Instance.ShowTips("session结构不对");
         }
+    }
+
+    /// <summary>
+    /// 登录成功后一系列处理
+    /// </summary>
+    /// <param name="msg"></param>
+    private void OnLoginSuccess(RetLoginMsg msg)
+    {
+        RecordAccountMsg(msg);
+        ConnectedServer(msg);
+
+    }
+
+    /// <summary>
+    /// 账号密码信息存在本地
+    /// </summary>
+    private void RecordAccountMsg(RetLoginMsg msg)
+    {
+        //todo 
+    }
+
+    private void ConnectedServer(RetLoginMsg msg)
+    {
+        RetTeamAddr addr = new RetTeamAddr();
+        addr.Key = msg.Key;
+        addr.Address = msg.Address;
+        NetworkUpdater.Instance.OnConnectedServer(addr);
     }
 
 
